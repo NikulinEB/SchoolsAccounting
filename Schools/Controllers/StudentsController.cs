@@ -41,6 +41,29 @@ namespace Schools.Controllers
         {
             try
             {
+                if (newStudent == null)
+                {
+                    ModelState.AddModelError("Student", "Неверный формат. Передайте объект Class в формате JSON.");
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(newStudent.FirstName) || string.IsNullOrEmpty(newStudent.LastName) || string.IsNullOrEmpty(newStudent.Patronymic))
+                    {
+                        ModelState.AddModelError("Name", "Не указано имя, фамилия или отчество. Укажите их в соответствующих полях: FirstName, LastName, Patronymic.");
+                    }
+                    if (string.IsNullOrEmpty(newStudent.Address))
+                    {
+                        ModelState.AddModelError("Address", "Не указан адрес. Укажите адрес в поле Address.");
+                    }
+                    if (newStudent.Birthday.Ticks == 0)
+                    {
+                        ModelState.AddModelError("Birthday", "Не указана дата рождения. Укажите дату рождения в поле Birthday, например, 1994 11 08.");
+                    }
+                }
+                if (!ModelState.IsValid)
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK, ModelState.Values);
+                }
                 using (var container = new SchoolsModelContainer())
                 {
                     container.StudentSet.Add(newStudent);

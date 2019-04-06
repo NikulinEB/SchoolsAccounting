@@ -41,6 +41,25 @@ namespace Schools.Controllers
         {
             try
             {
+                if (newClass == null)
+                {
+                    ModelState.AddModelError("Class", "Неверный формат. Передайте объект Class в формате JSON.");
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(newClass.Letter))
+                    {
+                        ModelState.AddModelError("Letter", "Не указана литера класса. Укажите литеру в поле Letter.");
+                    }
+                    if (newClass.Number == 0)
+                    {
+                        ModelState.AddModelError("Number", "Не указан номер класса. Укажите номер в поле Number.");
+                    }
+                }
+                if (!ModelState.IsValid)
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK, ModelState.Values);
+                }
                 using (var container = new SchoolsModelContainer())
                 {
                     var school = container.SchoolSet.Find(newClass.SchoolId);
