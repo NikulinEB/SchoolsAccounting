@@ -6,24 +6,33 @@ using System.Linq;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using System.Net;
 
 namespace Schools.Controllers
 {
     public class ClassesController : ApiController
     {
         // GET api/class/get/5
-        public Class Get(int id)
+        public HttpResponseMessage Get(int id)
         {
             try
             {
                 using (var container = new SchoolsModelContainer())
                 {
-                    return container.ClassSet.Find(id);
+                    var resultClass = container.ClassSet.Find(id);
+                    if (resultClass != null)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, resultClass);
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, $"Не найден класс с Id {id}.");
+                    }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Ошибка при выполнении запроса: {ex.Message}");
             }
         }
 
@@ -34,30 +43,50 @@ namespace Schools.Controllers
             {
                 using (var container = new SchoolsModelContainer())
                 {
-                    container.ClassSet.Add(newClass);
-                    container.SaveChanges();
+                    var school = container.SchoolSet.Find(newClass.SchoolId);
+                    if (school != null)
+                    {
+                        container.ClassSet.Add(newClass);
+                        container.SaveChanges();
+                        return Request.CreateResponse(HttpStatusCode.OK, "Класс успешно добавлен.");
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, $"Не найдена школа с Id: {newClass.SchoolId}. Укажите верный Id школы в поле SchoolId.");
+                    }
                 }
-                return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
             }
-            catch
+            catch (Exception ex)
             {
-                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Ошибка при выполнении запроса: {ex.Message}");
             }
         }
 
         // api/class/getbyschool
-        public Class[] GetBySchool(int id)
+        public HttpResponseMessage GetBySchool(int id)
         {
             try
             {
                 using (var container = new SchoolsModelContainer())
                 {
-                    return container.ClassSet.Where(s => s.School.Id == id).ToArray();
+                    if (container.SchoolSet.Find(id) == null)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, $"Не найдена школа с Id {id}.");
+                    }
+                    var classes = container.ClassSet.Where(s => s.School.Id == id).ToArray();
+                    if (classes.Count() > 0)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, classes);
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, $"Не найдены классы для школы с Id {id}.");
+                    }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Ошибка при выполнении запроса: {ex.Message}");
             }
         }
     }

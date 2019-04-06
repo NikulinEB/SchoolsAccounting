@@ -6,24 +6,33 @@ using System.Web;
 using System.Web.Http;
 using Newtonsoft.Json;
 using System.Net.Http;
+using System.Net;
 
 namespace Schools.Controllers
 {
     public class StudentsController : ApiController
     {
         // GET api/students/get/5
-        public Student Get(int id)
+        public HttpResponseMessage Get(int id)
         {
             try
             {
                 using (var container = new SchoolsModelContainer())
                 {
-                    return container.StudentSet.Find(id);
+                    var student = container.StudentSet.Find(id);
+                    if (student != null)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, student);
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, $"Не найден школьник с Id {id}.");
+                    }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Ошибка при выполнении запроса: {ex.Message}");
             }
         }
 
@@ -37,49 +46,49 @@ namespace Schools.Controllers
                     container.StudentSet.Add(newStudent);
                     container.SaveChanges();
                 }
-                return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.OK, "Школьник успешно добавлен.");
             }
-            catch
+            catch (Exception ex)
             {
-                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Ошибка при выполнении запроса: {ex.Message}");
             }
         }
 
         // POST api/students/getbyclass/4
         [HttpPost]
-        public Student[] GetByClass([FromBody]SearchParameters input)
+        public HttpResponseMessage GetByClass([FromBody]SearchParameters input)
         {
             try
             {
                 using (var container = new SchoolsModelContainer())
                 {
-                    return container.StudentSet.Where(s => s.Class.Id == input.Id && 
+                    return Request.CreateResponse(HttpStatusCode.OK, container.StudentSet.Where(s => s.Class.Id == input.Id && 
                         !container.ClassOperationSet.Any(op => op.Student.Id == s.Id && 
-                        op.Class.Id == input.Id && op.Date <= input.Date && op.OperationType == GradeOperationType.Exclude)).ToArray();
+                        op.Class.Id == input.Id && op.Date <= input.Date && op.OperationType == GradeOperationType.Exclude)).ToArray());
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Ошибка при выполнении запроса: {ex.Message}");
             }
         }
 
         // POST api/students/getbyschool/1
         [HttpPost]
-        public Student[] GetBySchool([FromBody]SearchParameters input)
+        public HttpResponseMessage GetBySchool([FromBody]SearchParameters input)
         {
             try
             {
                 using (var container = new SchoolsModelContainer())
                 {
-                    return container.StudentSet.Where(s => s.Class.School.Id == input.Id &&
+                    return Request.CreateResponse(HttpStatusCode.OK, container.StudentSet.Where(s => s.Class.School.Id == input.Id &&
                     !container.ClassOperationSet.Any(op => op.Student.Id == s.Id &&
-                    op.Class.School.Id == input.Id && op.Date <= input.Date && op.OperationType == GradeOperationType.Exclude)).ToArray();
+                    op.Class.School.Id == input.Id && op.Date <= input.Date && op.OperationType == GradeOperationType.Exclude)).ToArray());
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Ошибка при выполнении запроса: {ex.Message}");
             }
         }
 

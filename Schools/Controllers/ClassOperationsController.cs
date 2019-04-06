@@ -3,6 +3,7 @@ using Schools.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
@@ -32,11 +33,11 @@ namespace Schools.Controllers
                     container.ClassOperationSet.Add(operation);
                     container.SaveChanges();
                 }
-                return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.OK, "Зачисление выполнено успешно.");
             }
-            catch
+            catch (Exception ex)
             {
-                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Ошибка при выполнении запроса: {ex.Message}");
             }
         }
 
@@ -55,11 +56,11 @@ namespace Schools.Controllers
                     container.Entry(currentStudent).State = System.Data.Entity.EntityState.Modified;
                     container.SaveChanges();
                 }
-                return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.OK, "Отчисление выполнено успешно.");
             }
-            catch
+            catch (Exception ex)
             {
-                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, $"Ошибка при выполнении запроса: {ex.Message}");
             }
         }
     }
