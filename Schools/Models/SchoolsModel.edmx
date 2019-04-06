@@ -1,0 +1,308 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="SchoolsModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="SchoolsModelStoreContainer">
+    <EntitySet Name="SchoolSet" EntityType="SchoolsModel.Store.SchoolSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ClassSet" EntityType="SchoolsModel.Store.ClassSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="StudentSet" EntityType="SchoolsModel.Store.StudentSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ClassOperationSet" EntityType="SchoolsModel.Store.ClassOperationSet" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="StudentClass" Association="SchoolsModel.Store.StudentClass">
+      <End Role="Student" EntitySet="StudentSet" />
+      <End Role="Class" EntitySet="ClassSet" />
+    </AssociationSet>
+    <AssociationSet Name="SchoolClass" Association="SchoolsModel.Store.SchoolClass">
+      <End Role="School" EntitySet="SchoolSet" />
+      <End Role="Class" EntitySet="ClassSet" />
+    </AssociationSet>
+    <AssociationSet Name="ClassOperationStudent" Association="SchoolsModel.Store.ClassOperationStudent">
+      <End Role="ClassOperation" EntitySet="ClassOperationSet" />
+      <End Role="Student" EntitySet="StudentSet" />
+    </AssociationSet>
+    <AssociationSet Name="ClassOperationClass" Association="SchoolsModel.Store.ClassOperationClass">
+      <End Role="ClassOperation" EntitySet="ClassOperationSet" />
+      <End Role="Class" EntitySet="ClassSet" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="SchoolSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Address" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="ClassSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Number" Type="int" Nullable="false" />
+    <Property Name="Letter" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="SchoolId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="StudentSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="FirstName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="LastName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Patronymic" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Birthday" Type="datetime" Nullable="false" />
+    <Property Name="Address" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Class_Id" Type="int" Nullable="true" />
+  </EntityType>
+  <EntityType Name="ClassOperationSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Date" Type="datetime" Nullable="false" />
+    <Property Name="OperationType" Type="int" Nullable="false" />
+    <Property Name="Student_Id" Type="int" Nullable="false" />
+    <Property Name="Class_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="StudentClass">
+    <End Role="Student" Type="SchoolsModel.Store.StudentSet" Multiplicity="*" />
+    <End Role="Class" Type="SchoolsModel.Store.ClassSet" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Class">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Student">
+        <PropertyRef Name="Class_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="SchoolClass">
+    <End Role="School" Type="SchoolsModel.Store.SchoolSet" Multiplicity="1" />
+    <End Role="Class" Type="SchoolsModel.Store.ClassSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="School">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Class">
+        <PropertyRef Name="SchoolId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ClassOperationStudent">
+    <End Role="ClassOperation" Type="SchoolsModel.Store.ClassOperationSet" Multiplicity="*" />
+    <End Role="Student" Type="SchoolsModel.Store.StudentSet" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="Student">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="ClassOperation">
+        <PropertyRef Name="Student_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ClassOperationClass">
+    <End Role="ClassOperation" Type="SchoolsModel.Store.ClassOperationSet" Multiplicity="*" />
+    <End Role="Class" Type="SchoolsModel.Store.ClassSet" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="Class">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="ClassOperation">
+        <PropertyRef Name="Class_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="SchoolsModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+        <EntityContainer Name="SchoolsModelContainer" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="SchoolSet" EntityType="SchoolsModel.School" />
+          <EntitySet Name="ClassSet" EntityType="SchoolsModel.Class" />
+          <EntitySet Name="StudentSet" EntityType="SchoolsModel.Student" />
+          <AssociationSet Name="StudentClass" Association="SchoolsModel.StudentClass">
+            <End Role="Student" EntitySet="StudentSet" />
+            <End Role="Class" EntitySet="ClassSet" />
+          </AssociationSet>
+          <AssociationSet Name="SchoolClass" Association="SchoolsModel.SchoolClass">
+            <End Role="School" EntitySet="SchoolSet" />
+            <End Role="Class" EntitySet="ClassSet" />
+          </AssociationSet>
+          <EntitySet Name="ClassOperationSet" EntityType="SchoolsModel.ClassOperation" />
+          <AssociationSet Name="ClassOperationStudent" Association="SchoolsModel.ClassOperationStudent">
+            <End Role="ClassOperation" EntitySet="ClassOperationSet" />
+            <End Role="Student" EntitySet="StudentSet" />
+          </AssociationSet>
+          <AssociationSet Name="ClassOperationClass" Association="SchoolsModel.ClassOperationClass">
+            <End Role="ClassOperation" EntitySet="ClassOperationSet" />
+            <End Role="Class" EntitySet="ClassSet" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="School">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Address" Type="String" Nullable="false" />
+          <NavigationProperty Name="Classes" Relationship="SchoolsModel.SchoolClass" FromRole="School" ToRole="Class" />
+        </EntityType>
+        <EntityType Name="Class">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Number" Type="Int32" Nullable="false" />
+          <Property Name="Letter" Type="String" Nullable="false" />
+          <NavigationProperty Name="Students" Relationship="SchoolsModel.StudentClass" FromRole="Class" ToRole="Student" />
+          <NavigationProperty Name="School" Relationship="SchoolsModel.SchoolClass" FromRole="Class" ToRole="School" />
+          <Property Name="SchoolId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ClassOperations" Relationship="SchoolsModel.ClassOperationClass" FromRole="Class" ToRole="ClassOperation" />
+        </EntityType>
+        <EntityType Name="Student">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FirstName" Type="String" Nullable="false" />
+          <Property Name="LastName" Type="String" Nullable="false" />
+          <Property Name="Patronymic" Type="String" Nullable="false" />
+          <Property Name="Birthday" Type="DateTime" Nullable="false" />
+          <Property Name="Address" Type="String" Nullable="false" />
+          <NavigationProperty Name="Class" Relationship="SchoolsModel.StudentClass" FromRole="Student" ToRole="Class" />
+          <NavigationProperty Name="ClassOperations" Relationship="SchoolsModel.ClassOperationStudent" FromRole="Student" ToRole="ClassOperation" />
+        </EntityType>
+        <Association Name="StudentClass">
+          <End Type="SchoolsModel.Student" Role="Student" Multiplicity="*" />
+          <End Type="SchoolsModel.Class" Role="Class" Multiplicity="0..1" />
+        </Association>
+        <Association Name="SchoolClass">
+          <End Type="SchoolsModel.School" Role="School" Multiplicity="1" />
+          <End Type="SchoolsModel.Class" Role="Class" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="School">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Class">
+              <PropertyRef Name="SchoolId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ClassOperation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Date" Type="DateTime" Nullable="false" />
+          <NavigationProperty Name="Student" Relationship="SchoolsModel.ClassOperationStudent" FromRole="ClassOperation" ToRole="Student" />
+          <NavigationProperty Name="Class" Relationship="SchoolsModel.ClassOperationClass" FromRole="ClassOperation" ToRole="Class" />
+          <Property Name="OperationType" Type="SchoolsModel.GradeOperationType" Nullable="false" />
+        </EntityType>
+        <Association Name="ClassOperationStudent">
+          <End Type="SchoolsModel.ClassOperation" Role="ClassOperation" Multiplicity="*" />
+          <End Type="SchoolsModel.Student" Role="Student" Multiplicity="1" />
+        </Association>
+        <Association Name="ClassOperationClass">
+          <End Type="SchoolsModel.ClassOperation" Role="ClassOperation" Multiplicity="*" />
+          <End Type="SchoolsModel.Class" Role="Class" Multiplicity="1" />
+        </Association>
+        <EnumType Name="GradeOperationType">
+          <Member Name="Include" />
+          <Member Name="Exclude" />
+        </EnumType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="SchoolsModelStoreContainer" CdmEntityContainer="SchoolsModelContainer">
+    <EntitySetMapping Name="SchoolSet">
+      <EntityTypeMapping TypeName="IsTypeOf(SchoolsModel.School)">
+        <MappingFragment StoreEntitySet="SchoolSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Address" ColumnName="Address" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ClassSet">
+      <EntityTypeMapping TypeName="IsTypeOf(SchoolsModel.Class)">
+        <MappingFragment StoreEntitySet="ClassSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Number" ColumnName="Number" />
+          <ScalarProperty Name="Letter" ColumnName="Letter" />
+          <ScalarProperty Name="SchoolId" ColumnName="SchoolId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="StudentSet">
+      <EntityTypeMapping TypeName="IsTypeOf(SchoolsModel.Student)">
+        <MappingFragment StoreEntitySet="StudentSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+          <ScalarProperty Name="LastName" ColumnName="LastName" />
+          <ScalarProperty Name="Patronymic" ColumnName="Patronymic" />
+          <ScalarProperty Name="Birthday" ColumnName="Birthday" />
+          <ScalarProperty Name="Address" ColumnName="Address" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ClassOperationSet">
+      <EntityTypeMapping TypeName="IsTypeOf(SchoolsModel.ClassOperation)">
+        <MappingFragment StoreEntitySet="ClassOperationSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="OperationType" ColumnName="OperationType" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="StudentClass" TypeName="SchoolsModel.StudentClass" StoreEntitySet="StudentSet">
+      <EndProperty Name="Class">
+        <ScalarProperty Name="Id" ColumnName="Class_Id" />
+      </EndProperty>
+      <EndProperty Name="Student">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+      <Condition ColumnName="Class_Id" IsNull="false" />
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="ClassOperationStudent" TypeName="SchoolsModel.ClassOperationStudent" StoreEntitySet="ClassOperationSet">
+      <EndProperty Name="Student">
+        <ScalarProperty Name="Id" ColumnName="Student_Id" />
+      </EndProperty>
+      <EndProperty Name="ClassOperation">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="ClassOperationClass" TypeName="SchoolsModel.ClassOperationClass" StoreEntitySet="ClassOperationSet">
+      <EndProperty Name="Class">
+        <ScalarProperty Name="Id" ColumnName="Class_Id" />
+      </EndProperty>
+      <EndProperty Name="ClassOperation">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
