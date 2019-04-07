@@ -85,14 +85,45 @@ namespace Schools.Controllers
             {
                 using (var container = new SchoolsModelContainer())
                 {
-                    return Request.CreateResponse(HttpStatusCode.OK, container.StudentSet.Where(s => s.Class.Id == input.Id && 
-                        !container.ClassOperationSet.Any(op => op.Student.Id == s.Id && 
-                        op.Class.Id == input.Id && op.Date <= input.Date && op.OperationType == GradeOperationType.Exclude)).ToArray());
+                    // Поиск учеников на текущую дату.
+                    if (input.Date.Ticks == 0)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, container.StudentSet.Where(s => s.Class.Id == input.Id).ToArray());
+                    }
+                    // Поиск учеников на указанную дату.
+                    else
+                    {
+                        var includedStudents = container.StudentSet.ToList().Where(s => WasInClass(s.Id, input.Id, input.Date)).ToArray();
+                        if (includedStudents.Count() > 0)
+                        {
+                            return Request.CreateResponse(HttpStatusCode.OK, includedStudents);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.OK, "Отсутствуют ученики в указанном классе на указанную дату.");
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, $"Ошибка при выполнении запроса: {ex.Message}");
+            }
+        }
+
+        private bool WasInClass(int studentId, int classId, DateTime date)
+        {
+            using (var container = new SchoolsModelContainer())
+            {
+                var operations = container.ClassOperationSet.Where(op => op.Student.Id == studentId && op.Class.Id == classId &&
+                op.Date <= date);
+                if (operations.Count() > 0)
+                {
+                    var sorted = operations.OrderBy(op => op.Date).ToList();
+                    var last = sorted.Last();
+                    return last.OperationType == GradeOperationType.Include;
+                }
+                return false;
             }
         }
 
@@ -104,9 +135,24 @@ namespace Schools.Controllers
             {
                 using (var container = new SchoolsModelContainer())
                 {
-                    return Request.CreateResponse(HttpStatusCode.OK, container.StudentSet.Where(s => s.Class.School.Id == input.Id &&
-                    !container.ClassOperationSet.Any(op => op.Student.Id == s.Id &&
-                    op.Class.School.Id == input.Id && op.Date <= input.Date && op.OperationType == GradeOperationType.Exclude)).ToArray());
+                    // Поиск учеников на текущую дату.
+                    if (input.Date.Ticks == 0)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, container.StudentSet.Where(s => s.Class.School.Id == input.Id).ToArray());
+                    }
+                    // Поиск учеников на указанную дату.
+                    else
+                    {
+                        var includedStudents = container.StudentSet.ToList().Where(s => WasInSchool(s.Id, input.Id, input.Date)).ToArray();
+                        if (includedStudents.Count() > 0)
+                        {
+                            return Request.CreateResponse(HttpStatusCode.OK, includedStudents);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.OK, "Отсутствуют ученики в указанной школе на указанную дату.");
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -114,6 +160,23 @@ namespace Schools.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, $"Ошибка при выполнении запроса: {ex.Message}");
             }
         }
+
+        private bool WasInSchool(int studentId, int schoolId, DateTime date)
+        {
+            using (var container = new SchoolsModelContainer())
+            {
+                var operations = container.ClassOperationSet.Where(op => op.Student.Id == studentId && op.Class.School.Id == schoolId &&
+                op.Date <= date);
+                if (operations.Count() > 0)
+                {
+                    var sorted = operations.OrderBy(op => op.Date).ToList();
+                    var last = sorted.Last();
+                    return last.OperationType == GradeOperationType.Include;
+                }
+                return false;
+            }
+        }
+
 
         public class SearchParameters
         {
